@@ -24,7 +24,22 @@ public class Lander : MonoBehaviour {
         }
     }
 
-    private void Update() {
+    private void OnCollisionEnter2D(Collision2D other) {
+        float softLandingVelocityMagnitude = 4f;
+        float minLandingDotVal = .90f;
+        float landingDotVal = Vector2.Dot(Vector2.up, transform.up);
+        
+        if (other.relativeVelocity.magnitude > softLandingVelocityMagnitude) {
+            Debug.Log("crash");
+        }
+        if (landingDotVal < minLandingDotVal) {
+            Debug.Log("landed with bad angle");
+        }
+        else {
+            Debug.Log("land");
+        }
         
     }
+    
+    
 }
