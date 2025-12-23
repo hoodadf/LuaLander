@@ -2,6 +2,7 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = System.Random;
 
 public class Lander : MonoBehaviour {
     public event EventHandler OnUpForce;
@@ -13,23 +14,43 @@ public class Lander : MonoBehaviour {
     
     private float forwardForce = 700f;
     private float turnSpeed = 100f;
+    private float feul = 10f;
+    private float feulConsumption = 1f;
+
+    private int coins = 0;
+    
     private void Awake() {
         landerRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
+    private void consumeFuel() {
+        feul -= feulConsumption * Time.deltaTime;
+        Debug.Log(feul);
+    }
+
     private void FixedUpdate() {
         OnBeforeForce?.Invoke(this,EventArgs.Empty);
-        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed) {
+
+        bool upKeyPressed = Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed;
+        bool rightKeyPressed = Keyboard.current.upArrowKey.isPressed || Keyboard.current.dKey.isPressed;
+        bool leftKeyPressed = Keyboard.current.upArrowKey.isPressed || Keyboard.current.aKey.isPressed;
+
+        if (feul <= 0f) {
+            Debug.Log("out of feul!!!!");
+            return;
+        }
+        if(upKeyPressed || leftKeyPressed || rightKeyPressed) consumeFuel();
+        if (upKeyPressed) {
             landerRigidbody2D.AddForce(forwardForce * transform.up * Time.deltaTime);
             OnUpForce?.Invoke(this,EventArgs.Empty);
         }
         
-        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.dKey.isPressed) {
+        if (rightKeyPressed) {
             landerRigidbody2D.AddTorque(-turnSpeed * Time.deltaTime);
             OnRightRot?.Invoke(this,EventArgs.Empty);
         }
         
-        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.aKey.isPressed) {
+        if (leftKeyPressed) {
             landerRigidbody2D.AddTorque(+turnSpeed * Time.deltaTime);  
             OnLeftRot?.Invoke(this,EventArgs.Empty);
         }
@@ -74,6 +95,27 @@ public class Lander : MonoBehaviour {
 
 
     }
-    
-    
+
+    private float randomFeulPickupAmount() {
+        float minAmount = 4f;
+        float maxAmount = 8f;
+        Random rand = new Random();
+        return (float)(rand.NextDouble() * (maxAmount - minAmount) + minAmount);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        float maxFeulAmount = 10f;
+        if(other.TryGetComponent(out FeulPickup feulPickup)) {
+            feul += randomFeulPickupAmount();
+            if (feul > maxFeulAmount) feul = maxFeulAmount;
+            Debug.Log("refilled");
+            feulPickup.destroySelf();
+        }
+
+        if (other.TryGetComponent(out Coin coin)) {
+            coins++;
+            Debug.Log(coins);
+            coin.destroySelf();
+        }
+    }
 }
