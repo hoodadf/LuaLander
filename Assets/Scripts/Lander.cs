@@ -13,6 +13,10 @@ public class Lander : MonoBehaviour {
     public event EventHandler OnBeforeForce;
     public event EventHandler OnCoinPickup;
     public event EventHandler OnFeulPickup;
+    public event EventHandler<OnLandedEventArgs> OnLanded;
+    public class OnLandedEventArgs : EventArgs {
+        public int score;
+    }
     
     private Rigidbody2D landerRigidbody2D;
     
@@ -83,7 +87,7 @@ public class Lander : MonoBehaviour {
         
         Debug.Log("successful landing!");
 
-
+        //landing score calculation
         float maxScoreLandingAngle = 100;
         float scoreDotVectorMultiplier = 10f;
         float landingAngleScore = maxScoreLandingAngle -
@@ -94,10 +98,11 @@ public class Lander : MonoBehaviour {
         Debug.Log("Landing Angle Score: " + landingAngleScore);
         Debug.Log("Landing Speed Score: " + landingSpeedScore);
 
-        float totalScore = (landingSpeedScore + landingAngleScore) * landingPad.getMultiplier();
+        int totalScore = (int)((landingSpeedScore + landingAngleScore) * landingPad.getMultiplier());
         
         Debug.Log("Total Landing Score: " + totalScore);
-
+        
+        OnLanded?.Invoke(this,new OnLandedEventArgs{ score = totalScore });
 
     }
 
