@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 using Random = System.Random;
 
 public class Lander : MonoBehaviour {
+    public static Lander Instance { get; private set; }
+    
     public event EventHandler OnUpForce;
     public event EventHandler OnLeftRot;
     public event EventHandler OnRightRot;
@@ -22,6 +24,7 @@ public class Lander : MonoBehaviour {
     private int coins = 0;
     
     private void Awake() {
+        Instance = this;
         landerRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
