@@ -5,10 +5,14 @@ using UnityEngine.InputSystem;
 using Random = System.Random;
 
 public class Lander : MonoBehaviour {
+    public static Lander Instance { get; private set; }
+    
     public event EventHandler OnUpForce;
     public event EventHandler OnLeftRot;
     public event EventHandler OnRightRot;
     public event EventHandler OnBeforeForce;
+    public event EventHandler OnCoinPickup;
+    public event EventHandler OnFeulPickup;
     
     private Rigidbody2D landerRigidbody2D;
     
@@ -20,6 +24,7 @@ public class Lander : MonoBehaviour {
     private int coins = 0;
     
     private void Awake() {
+        Instance = this;
         landerRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
@@ -109,12 +114,14 @@ public class Lander : MonoBehaviour {
             feul += randomFeulPickupAmount();
             if (feul > maxFeulAmount) feul = maxFeulAmount;
             Debug.Log("refilled");
+            OnFeulPickup?.Invoke(this,EventArgs.Empty);
             feulPickup.destroySelf();
         }
 
         if (other.TryGetComponent(out Coin coin)) {
             coins++;
             Debug.Log(coins);
+            OnCoinPickup?.Invoke(this,EventArgs.Empty);
             coin.destroySelf();
         }
     }
