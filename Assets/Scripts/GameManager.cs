@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour {
     private void Awake() {
         Instance = this;
     }
-    private void start() {
+    private void Start() {
         Lander.Instance.OnCoinPickup += OnCoinPickup;
         Lander.Instance.OnLanded += OnLanded;
     }
@@ -21,16 +21,15 @@ public class GameManager : MonoBehaviour {
 
     private void OnLanded(object sender, Lander.OnLandedEventArgs e) {
         addScore(e.score);
-        Debug.Log(score);
     }
 
     private void OnCoinPickup(object sender, EventArgs e) {
         addScore(500);
-        Debug.Log(score);
     }
 
     private void addScore(int scoreAmount) {
         score += scoreAmount;
+        Debug.Log(score);
     }
 
     public int getScore() {
