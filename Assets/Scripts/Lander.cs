@@ -32,9 +32,12 @@ public class Lander : MonoBehaviour {
         landerRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
+    public int getFeul() {
+        return (int) (10 * feul);
+    }
+
     private void consumeFuel() {
         feul -= feulConsumption * Time.deltaTime;
-        Debug.Log(feul);
     }
 
     private void FixedUpdate() {
@@ -45,7 +48,6 @@ public class Lander : MonoBehaviour {
         bool leftKeyPressed = Keyboard.current.upArrowKey.isPressed || Keyboard.current.aKey.isPressed;
 
         if (feul <= 0f) {
-            Debug.Log("out of feul!!!!");
             return;
         }
         if(upKeyPressed || leftKeyPressed || rightKeyPressed) consumeFuel();
@@ -94,13 +96,10 @@ public class Lander : MonoBehaviour {
                                   Mathf.Abs(landingDotVal - 1f) * scoreDotVectorMultiplier * maxScoreLandingAngle;
         float maxScoreLandingSpeed = 100;
         float landingSpeedScore = (softLandingVelocityMagnitude - relativeVelocityMagnitude) * maxScoreLandingSpeed;
-        
-        Debug.Log("Landing Angle Score: " + landingAngleScore);
-        Debug.Log("Landing Speed Score: " + landingSpeedScore);
 
         int totalScore = (int)((landingSpeedScore + landingAngleScore) * landingPad.getMultiplier());
         
-        Debug.Log("Total Landing Score: " + totalScore);
+        //Debug.Log("Total Landing Score: " + totalScore);
         
         OnLanded?.Invoke(this,new OnLandedEventArgs{ score = totalScore });
 
@@ -118,16 +117,18 @@ public class Lander : MonoBehaviour {
         if(other.TryGetComponent(out FeulPickup feulPickup)) {
             feul += randomFeulPickupAmount();
             if (feul > maxFeulAmount) feul = maxFeulAmount;
-            Debug.Log("refilled");
             OnFeulPickup?.Invoke(this,EventArgs.Empty);
             feulPickup.destroySelf();
         }
 
         if (other.TryGetComponent(out Coin coin)) {
             coins++;
-            Debug.Log(coins);
             OnCoinPickup?.Invoke(this,EventArgs.Empty);
             coin.destroySelf();
         }
+    }
+
+    public int getCoin() {
+        return coins;
     }
 }
